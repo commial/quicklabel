@@ -11,6 +11,41 @@ import numpy as np
 MODEL2CLS = {"ResNet50": ResNet50}
 CLASSIFIER2CLS = {"RandomForest": RandomForestClassifier}
 
+INFO_OPTIONS = {"suffix":
+                {
+                    "description": "append to candidate labels",
+                    "parser": str,
+                },
+                "dataset": {
+                    "description": "dataset source",
+                    "parser": str,
+                },
+                "needhelp": {
+                    "description": "directory for unsure candidate",
+                    "parser": str,
+                },
+                "needhelp_prob": {
+                    "description": "probability threshold for 'needhelp' choice",
+                    "parser": float,
+                },
+                "new_sample": {
+                    "description": "number of new samples to proceed per step",
+                    "parser": str,
+                },
+                "model": {
+                    "description": "model to use for feature generation",
+                    "parser": str,
+                },
+                "classifier": {
+                    "description": "classifier to use feature classification",
+                    "parser": str,
+                },
+                "force_diversity": {
+                    "description": "force at least one 'needhelp' or all category on step",
+                    "parser": lambda x: x.lower() == "true",
+                },
+}
+
 DEFAULT_OPTIONS = {"suffix": "_potential",
                    "dataset": "dataset",
                    "needhelp": "needhelp",
@@ -20,7 +55,28 @@ DEFAULT_OPTIONS = {"suffix": "_potential",
                    "classifier": "RandomForest",
                    "force_diversity": True,
 }
-Options = namedtuple("Options", DEFAULT_OPTIONS.keys())
+
+class Options(object):
+    """Option handler class"""
+
+    def __init__(self, *args, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def set_option(self, name, value):
+        value = INFO_OPTIONS[name]["parser"](value)
+        setattr(self, name, value)
+
+    def __str__(self):
+        out = []
+        for option, default_value in DEFAULT_OPTIONS.iteritems():
+            cur_value = getattr(self, option)
+            description = INFO_OPTIONS[option]["description"]
+            out.append("\t{name:20s}\t{cur:20s} {desc:s} (default is '{default:s}')".format(
+                name=str(option),
+                cur=str(cur_value),
+                desc=description,
+                default=str(default_value)))
+        return "\n".join(out)
 
 
 class Labelizer(object):

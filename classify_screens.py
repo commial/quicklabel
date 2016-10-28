@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from pdb import pm
 import cmd
 
-from labelizer import Labelizer, DEFAULT_OPTIONS
+from labelizer import Labelizer, INFO_OPTIONS, DEFAULT_OPTIONS
 
 
 class LabelizerCli(cmd.Cmd):
@@ -52,13 +52,26 @@ class LabelizerCli(cmd.Cmd):
         self.do_labels("")
 
     def do_options(self, line):
-        self.log("Current options:")
-        for option, default_value in DEFAULT_OPTIONS.iteritems():
-            cur_value = getattr(self.labelizer.options, option)
-            self.log("\t{name:20s}\t{cur:20s} (default is '{default:s}')".format(
-                name=str(option),
-                cur=str(cur_value),
-                default=str(default_value)))
+        if line:
+            # Set a value
+            try:
+                info = line.split(" ", 1)
+                name, value = info
+                self.labelizer.options.set_option(name, value)
+            except Exception as e:
+                self.log(e)
+                return
+
+            # Special cases
+            if name == "model":
+                self.labelizer.load_model()
+            elif name == "classifier":
+                if hasattr(self.labelizer, name):
+                    delattr(self.labelizer, name)
+            self.log("%s = %s" % (name, getattr(self.labelizer.options, name)))
+        else:
+            self.log("Current options:\n%s" % self.labelizer.options)
+            self.log("Use options <name> <value> to set an option")
 
     def do_EOF(self, line):
         return True
