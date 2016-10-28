@@ -12,9 +12,11 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 MODEL2CLS = {"ResNet50": ResNet50}
+CLASSIFIER2CLS = {"RandomForest": RandomForestClassifier}
+
 Options = namedtuple("Options", ["suffix", "dataset", "needhelp",
                                  "needhelp_prob", "new_sample",
-                                     "model"])
+                                 "model", "classifier"])
 class Labelizer(object):
 
     def __init__(self, directory):
@@ -26,6 +28,7 @@ class Labelizer(object):
                                   "needhelp_prob": 0.7,
                                   "new_sample": 50,
                                   "model": "ResNet50",
+                                  "classifier": "RandomForest",
         })
         self.directory = directory
 
@@ -79,11 +82,11 @@ class Labelizer(object):
         # PRE: init_dir
         assert hasattr(self, "labels")
 
+        # Process labelised elements
         X_train = []
         Y_train = []
         already_done = set()
         for i, label in enumerate(self.labels):
-            print "Process %s elements" % label
             base_dir = os.path.join(args.directory, label)
             for element in os.listdir(base_dir):
                 elem_path = os.path.join(base_dir, element)
@@ -91,7 +94,7 @@ class Labelizer(object):
                     continue
                 name = element
 
-                # Avoid processing an already labelised element
+                # Avoid further processing of an already labelised element
                 already_done.add(name)
                 feature = self.get_feature(elem_path)
 
@@ -99,16 +102,20 @@ class Labelizer(object):
                 Y_train.append(i)
 
         # Learn
+        ## Format elements
         assert len(X_train) == len(Y_train)
-        # TODO: multiple classifier
-        rfc = RandomForestClassifier()
-        X_train = np.array(X_train)
-        Y_train = np.array(Y_train)
         if (len(Y_train) == 0 or
             len(set(Y_train)) == 1):
             raise ValueError("At least 2 labels with at least one element are required")
-        rfc.fit(X_train, Y_train)
-        self.classifier = rfc
+        X_train = np.array(X_train)
+        Y_train = np.array(Y_train)
+
+        ## Fit classifier
+        cls = CLASSIFIER2CLS.get(self.options.classifier, None)
+        if cls is None:
+            raise ValueError("Unknown classifier %s" % self.options.classifier)
+        self.classifier = cls()
+        self.classifier.fit(X_train, Y_train)
         self._already_done = already_done
 
     def get_new_samples(self, force_diversity=False):
@@ -132,8 +139,9 @@ class Labelizer(object):
         for element in elements:
             if element in self._already_done:
                 continue
-            if i >= self.options.new_sample and has_diversity:
-                print "%d samples done, wait for all label or a needhelp" % i
+            if (i >= self.options.new_sample and
+                (not force_diversity or has_diversity)):
+                # wait for all label or a needhelp
                 break
             i += 1
             name = element
@@ -182,15 +190,24 @@ class LabelizerCli(cmd.Cmd):
     def preloop(self):
         self.log("Welcome. Type 'step' to move a step forward")
 
-    def do_labels(self):
+    def do_labels(self, line):
         self.log("Labels:")
         for label, count in self.labelizer.labels_count().iteritems():
             self.log("\t%s:\t%d" % (label, count))
 
+    def do_classifier(self, line):
+        if hasattr(self.labelizer, "classifier"):
+            self.log(self.labelizer.classifier)
+        else:
+            self.log("Error: at least one step is needed")
+
+    def do_model(self, line):
+        self.log(self.labelizer.options.model)
+
     def do_step(self, line):
         self.log("Clean the directory")
         self.labelizer.init_dir()
-        self.do_labels()
+        self.do_labels("")
         self.log("Learn on labelled elements")
         self.labelizer.learn()
         self.log("Look for new elements")
