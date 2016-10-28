@@ -18,6 +18,7 @@ DEFAULT_OPTIONS = {"suffix": "_potential",
                    "new_sample": 50,
                    "model": "ResNet50",
                    "classifier": "RandomForest",
+                   "force_diversity": True,
 }
 Options = namedtuple("Options", DEFAULT_OPTIONS.keys())
 
@@ -116,7 +117,7 @@ class Labelizer(object):
         self.classifier.fit(X_train, Y_train)
         self._already_done = already_done
 
-    def get_new_samples(self, limit=True, force_diversity=False):
+    def get_new_samples(self, limit=True):
         """Apply the current classifier on new sample
         @force_diversity: avoid only one potential class
         @limit: consider only a limited number of element
@@ -124,6 +125,7 @@ class Labelizer(object):
         # PRE: learn
         assert hasattr(self, "classifier")
 
+        force_diversity = self.options.force_diversity
         # Get some new samples
         dataset_path = os.path.join(self.directory, self.options.dataset)
         needhelp_dir = os.path.join(self.directory,
