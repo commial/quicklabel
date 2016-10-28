@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from pdb import pm
 import cmd
 
-from labelizer import Labelizer
+from labelizer import Labelizer, DEFAULT_OPTIONS
 
 
 class LabelizerCli(cmd.Cmd):
@@ -50,6 +50,15 @@ class LabelizerCli(cmd.Cmd):
         self.log("Apply on the full dataset")
         self.labelizer.get_new_samples(limit=False)
         self.do_labels("")
+
+    def do_options(self, line):
+        self.log("Current options:")
+        for option, default_value in DEFAULT_OPTIONS.iteritems():
+            cur_value = getattr(self.labelizer.options, option)
+            self.log("\t{name:20s}\t{cur:20s} (default is '{default:s}')".format(
+                name=str(option),
+                cur=str(cur_value),
+                default=str(default_value)))
 
     def do_EOF(self, line):
         return True
