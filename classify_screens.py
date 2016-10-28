@@ -46,6 +46,11 @@ class LabelizerCli(cmd.Cmd):
         self.log("Look for new elements")
         self.labelizer.get_new_samples()
 
+    def do_generalize(self, line):
+        self.log("Apply on the full dataset")
+        self.labelizer.get_new_samples(limit=False)
+        self.do_labels("")
+
     def do_EOF(self, line):
         return True
 

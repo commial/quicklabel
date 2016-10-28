@@ -116,9 +116,10 @@ class Labelizer(object):
         self.classifier.fit(X_train, Y_train)
         self._already_done = already_done
 
-    def get_new_samples(self, force_diversity=False):
+    def get_new_samples(self, limit=True, force_diversity=False):
         """Apply the current classifier on new sample
         @force_diversity: avoid only one potential class
+        @limit: consider only a limited number of element
         """
         # PRE: learn
         assert hasattr(self, "classifier")
@@ -137,7 +138,7 @@ class Labelizer(object):
         for element in elements:
             if element in self._already_done:
                 continue
-            if (i >= self.options.new_sample and
+            if ((limit and i >= self.options.new_sample) and
                 (not force_diversity or has_diversity)):
                 # wait for all label or a needhelp
                 break
