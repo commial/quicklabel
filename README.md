@@ -45,3 +45,8 @@ Using the default settings, the workflow is as follow:
 1. You can use `generalize` to apply this classification to the full dataset.
 
 Do not hesitate to take a look to `options` and modify the different hyperparameters, as thresholds, model, classifier, ...
+
+Examples
+========
+
+* [Extracting Windows login screenshots from a Modbus wordwide scan](examples/modbus_screenshots)
