@@ -35,7 +35,7 @@ Using the default settings, the workflow is as follow:
 
 1. In an empty directory, create a `dataset` directory containing the unlabelled images, with unique names (you may want to use a symbolic link for this)
 1. In this same directory, create a directory for each label you want to consider (for instance, `mylabel` and `not_mylabel`)
-1. Launch `labelizer.py` with this directory as argument
+1. Launch `classify_cli.py` with this directory as argument
 1. Aside, launch your preferred image visualisation tool, with an easy-to-use directory to directory copy interface. For instance, `gthumb` or several `thunar` window
 1. Put a few images in each label directory
 1. Launch the feature extraction, learning and search for new images by typing `step` in the CLI

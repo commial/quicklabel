@@ -62,7 +62,7 @@ Iterations
 Let's launch QuickLabel on our working directory.
 
 ```
-$ python classify_screens.py temporary/
+$ python classify_cli.py temporary/
 Using TensorFlow backend.
 Load model's weights
 Welcome. Type 'step' to move a step forward
