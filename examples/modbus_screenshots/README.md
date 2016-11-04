@@ -150,7 +150,7 @@ I didn't manually labelize all images from the dataset for verification, so here
 
 Label | Correct | Wrong | Total
 ----- | ------- | ----- | ------
-Not windows | 3 | 702 | 705
+Not windows | 702 | 3 | 705
 Windows | 52 | 13 | 65
 
 The *Windows* category:
