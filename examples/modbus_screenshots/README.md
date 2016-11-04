@@ -11,7 +11,24 @@ In this example, I will use QuickLabel to quickly extract screenshots looking li
 Preparing the dataset
 =====================
 
-TODO
+Following the instruction on the blog post, I imported the result in a local [IVRE](https://github.com/cea-sec/ivre) instance.
+Then, using the Python API:
+
+```Python
+import os
+from ivre.utils import int2ip
+from ivre.db import db
+
+outdir = "screenshots"
+for host in db.nmap.get(db.nmap.searchscreenshot()):
+    for port in host["ports"]:
+        if "screendata" in port:
+            data = port["screendata"]
+            ipaddr = int2ip(host["addr"])
+            open(os.path.join(outdir, "%s_%d.jpg" % (ipaddr, port["port"])), "w").write(data)
+```
+
+Now, the screenshots are in a `screenshots` directory, with an unique name.
 
 Initialization
 ==============
