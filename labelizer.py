@@ -1,6 +1,7 @@
 import os
 import shutil
 import random
+import logging
 from collections import namedtuple
 
 from keras.applications.resnet50 import ResNet50, preprocess_input
@@ -151,7 +152,11 @@ class Labelizer(object):
 
                 # Avoid further processing of an already labelised element
                 already_done.add(name)
-                feature = self.get_feature(elem_path)
+                try:
+                    feature = self.get_feature(elem_path)
+                except Exception as e:
+                    logging.exception(e)
+                    continue
 
                 X_train.append(feature)
                 Y_train.append(i)
@@ -205,7 +210,11 @@ class Labelizer(object):
             element_path = os.path.join(dataset_path, name)
             if not os.path.isfile(element_path):
                 continue
-            feature = self.get_feature(element_path)
+            try:
+                feature = self.get_feature(element_path)
+            except Exception as e:
+                logging.exception(e)
+                continue
 
             y = self.classifier.predict_proba(np.array([feature]))[0]
 
