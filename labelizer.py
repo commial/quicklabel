@@ -228,3 +228,15 @@ class Labelizer(object):
             if len(founds_label) == len(self.labels):
                 has_diversity = True
 
+
+    def preload(self):
+        """Preload the content of dataset into cache"""
+        # Get some new samples
+        dataset_path = os.path.join(self.directory, self.options.dataset)
+
+        for element in os.listdir(dataset_path):
+            name = element
+            element_path = os.path.join(dataset_path, name)
+            if not os.path.isfile(element_path):
+                continue
+            feature = self.get_feature(element_path)
