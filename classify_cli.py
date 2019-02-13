@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from pdb import pm
 import cmd
+import pickle
 
 from labelizer import Labelizer, INFO_OPTIONS, DEFAULT_OPTIONS
 
@@ -50,6 +51,18 @@ class LabelizerCli(cmd.Cmd):
         self.log("Apply on the full dataset")
         self.labelizer.get_new_samples(limit=False)
         self.do_labels("")
+
+    def do_preload(self, line):
+        self.log("Preload the full dataset")
+        self.labelizer.preload()
+
+    def do_dump(self, line):
+        with open(line, "w") as fdesc:
+            pickle.dump(self.labelizer._cache, fdesc)
+
+    def do_load(self, line):
+        with open(line) as fdesc:
+            self.labelizer._cache = pickle.load(fdesc)
 
     def do_options(self, line):
         if line:
