@@ -6,6 +6,13 @@ import pickle
 from labelizer import Labelizer, INFO_OPTIONS, DEFAULT_OPTIONS
 
 
+# UNCOMMENT TO REMOVE RANDOMIZATION (for reproductability)
+#
+# import numpy as np
+# import random
+# np.random.seed(0)
+# random.seed(0)
+
 class LabelizerCli(cmd.Cmd):
     """Interaction for quick labelization through Labelizer"""
 
